@@ -30,3 +30,24 @@ jobs:
           context: ./back-Despachos_SpringBoot/Springboot-API-REST-DESPACHO
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/backend-despachos:latest
+
+  deploy:
+    name: Deploy to EC2
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Connect and Deploy via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # Este comando busca automáticamente tu archivo docker-compose y entra a la carpeta correcta
+            cd $(dirname $(find ~ -name "docker-compose.yml" | head -n 1))
+            
+            # Descarga las nuevas imágenes desde Docker Hub
+            docker compose pull
+            
+            # Reinicia los servicios en segundo plano con los cambios aplicados
+            docker compose up -d
