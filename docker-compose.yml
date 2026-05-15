@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  
   db:
     image: postgres:15-alpine
     container_name: db-segura
@@ -13,13 +12,13 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - db_data:/var/lib/postgresql/data 
+      - db_data:/var/lib/postgresql/data
     networks:
       - red-backend
 
-
   ventas-service:
-    image: benjamin239/ventas-service:latest 
+    image: benjamin239/backend-ventas:latest
+    container_name: api-ventas
     restart: always
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/sistema_db
@@ -33,7 +32,7 @@ services:
       - red-backend
 
   despachos-service:
-    image: benjamin239/despachos-service:latest 
+    image: benjamin239/backend-despachos:latest
     container_name: api-despachos
     restart: always
     environment:
@@ -47,22 +46,8 @@ services:
     networks:
       - red-backend
 
-
-  auth-service:
-    image: benjamin239/auth-service:latest 
-    container_name: api-auth
-    restart: always
-    ports:
-      - "8083:8083"
-    depends_on:
-      - db
-    networks:
-      - red-backend
-
-
 volumes:
   db_data:
-
 
 networks:
   red-backend:
